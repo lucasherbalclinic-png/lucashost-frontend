@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LucasHost - Dashboard</title>
+<style>
+  body { font-family: Arial, sans-serif; background: #0f172a; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+  .card { background: #1e293b; padding: 2rem; border-radius: 12px; width: 320px; }
+  h2 { text-align: center; color: #38bdf8; }
+  input { width: 100%; padding: 10px; margin: 8px 0; border-radius: 6px; border: none; box-sizing: border-box; }
+  button { width: 100%; padding: 10px; background: #38bdf8; color: #0f172a; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; margin-top: 10px; }
+  button:hover { background: #0ea5e9; }
+  #message { text-align: center; margin-top: 10px; color: #4ade80; }
+  .toggle { text-align: center; margin-top: 15px; cursor: pointer; color: #94a3b8; }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <h2 id="formTitle">Karibu LucasHost</h2>
+  
+  <input type="text" id="fullName" placeholder="Jina lako" style="display:none;">
+  <input type="email" id="email" placeholder="Email">
+  <input type="password" id="password" placeholder="Password">
+  
+  <button onclick="submitForm()">Endelea</button>
+  <p id="message"></p>
+  <p class="toggle" onclick="toggleMode()">Bofya hapa: <span id="toggleText">Nina akaunti tayari (Ingia)</span></p>
+</div>
+
+<script>
+const API_URL = "https://lucashost-backend.onrender.com";
+let isSignup = true;
+
+function toggleMode() {
+  isSignup = !isSignup;
+  document.getElementById('fullName').style.display = isSignup ? 'block' : 'none';
+  document.getElementById('formTitle').innerText = isSignup ? 'Karibu LucasHost' : 'Ingia LucasHost';
+  document.getElementById('toggleText').innerText = isSignup ? 'Nina akaunti tayari (Ingia)' : 'Sina akaunti (Jisajili)';
+  document.getElementById('message').innerText = '';
+}
+
+async function submitForm() {
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+  const fullName = document.getElementById('fullName').value;
+  const messageEl = document.getElementById('message');
+  
+  messageEl.innerText = "Inasindika...";
+  
+  const endpoint = isSignup ? '/api/signup' : '/api/login';
+  const body = isSignup ? { email, password, full_name: fullName } : { email, password };
+  
+  try {
+    const res = await fetch(API_URL + endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    
+    if (res.ok) {
+      messageEl.style.color = '#4ade80';
+      messageEl.innerText = data.message;
+    } else {
+      messageEl.style.color = '#f87171';
+      messageEl.innerText = data.error || 'Kuna tatizo limejitokeza';
+    }
+  } catch (err) {
+    messageEl.style.color = '#f87171';
+    messageEl.innerText = 'Imeshindikana kuunganisha na server';
+  }
+}
+</script>
+
+</body>
+</html>

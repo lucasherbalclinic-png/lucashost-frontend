@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+DOCTYPE html>
 <html lang="sw">
 <head>
 <meta charset="UTF-8">
@@ -143,4 +143,173 @@
     </div>
 
     <button class="logout-btn" onclick="logout()">➜ Toka (Logout)</button>
-  </div>
+  </div><script>
+  const API_URL = "https://lucashost-backend.onrender.com";
+  let isSignup = true;
+  let passwordVisible = false;
+
+  const ICONS = {
+    'Domain Registration': { icon: '🌐', cls: 'icon-domain', desc: 'Sajili domain yako kwa haraka na kwa usalama.' },
+    'App Hosting': { icon: '🖥️', cls: 'icon-hosting', desc: 'Fikia programu zako mtandaoni kwa ufanisi.' },
+    'Auto Deployment': { icon: '☁️', cls: 'icon-deploy', desc: 'Pakia na dhibiti programu zako moja kwa moja.' }
+  };
+
+  window.addEventListener('DOMContentLoaded', () => {
+    const savedUser = localStorage.getItem('lucashost_user');
+    if (savedUser) {
+      showDashboard(savedUser);
+    }
+  });
+
+  function toggleMode() {
+    isSignup = !isSignup;
+    document.getElementById('fullNameField').style.display = isSignup ? 'block' : 'none';
+    document.getElementById('formTitle').innerText = isSignup ? 'Karibu LucasHost' : 'Ingia LucasHost';
+    document.getElementById('toggleText').innerText = isSignup ? 'Nina akaunti tayari (Ingia)' : 'Sina akaunti (Jisajili)';
+    clearErrors();
+  }
+
+  function togglePasswordView() {
+    passwordVisible = !passwordVisible;
+    document.getElementById('password').type = passwordVisible ? 'text' : 'password';
+    document.getElementById('toggleEye').innerText = passwordVisible ? 'Ficha' : 'Onyesha';
+  }
+
+  function clearErrors() {
+    document.getElementById('emailError').innerText = '';
+    document.getElementById('passwordError').innerText = '';
+    document.getElementById('fullNameError').innerText = '';
+    document.getElementById('message').innerText = '';
+  }
+
+  function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+
+  function validateForm(email, password, fullName) {
+    let valid = true;
+    clearErrors();
+
+    if (!email) {
+      document.getElementById('emailError').innerText = 'Weka email yako';
+      valid = false;
+    } else if (!isValidEmail(email)) {
+      document.getElementById('emailError').innerText = 'Email si sahihi';
+      valid = false;
+    }
+
+    if (!password) {
+      document.getElementById('passwordError').innerText = 'Weka password';
+      valid = false;
+    } else if (password.length < 6) {
+      document.getElementById('passwordError').innerText = 'Password iwe na herufi 6+';
+      valid = false;
+    }
+
+    if (isSignup && !fullName) {
+      document.getElementById('fullNameError').innerText = 'Weka jina lako';
+      valid = false;
+    }
+
+    return valid;
+  }
+
+  async function submitForm() {
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const fullName = document.getElementById('fullName').value.trim();
+    const messageEl = document.getElementById('message');
+    const submitBtn = document.getElementById('submitBtn');
+
+    if (!validateForm(email, password, fullName)) return;
+
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="spinner"></span> Inasindika...';
+    messageEl.style.color = '#94a3b8';
+    messageEl.innerText = '';
+
+    const endpoint = isSignup ? '/api/signup' : '/api/login';
+    const body = isSignup ? { email, password, full_name: fullName } : { email, password };
+
+    try {
+      const res = await fetch(API_URL + endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        messageEl.style.color = '#4ade80';
+        messageEl.innerText = data.message;
+
+        if (!isSignup) {
+          const name = (data.user && data.user.user_metadata && data.user.user_metadata.full_name) || email;
+          localStorage.setItem('lucashost_user', name);
+          setTimeout(() => showDashboard(name), 500);
+        } else {
+          setTimeout(() => {
+            toggleMode();
+            document.getElementById('email').value = email;
+          }, 1200);
+        }
+      } else {
+        messageEl.style.color = '#f87171';
+        messageEl.innerText = data.error || 'Kuna tatizo limejitokeza';
+      }
+    } catch (err) {
+      messageEl.style.color = '#f87171';
+      messageEl.innerText = 'Imeshindikana kuunganisha na server';
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.innerText = 'Endelea';
+    }
+  }
+
+  function showDashboard(name) {
+    document.getElementById('authCard').style.display = 'none';
+    document.getElementById('dashboardCard').style.display = 'block';
+    document.getElementById('userName').innerText = name + ' 👋';
+    loadServices();
+  }
+
+  function logout() {
+    localStorage.removeItem('lucashost_user');
+    document.getElementById('dashboardCard').style.display = 'none';
+    document.getElementById('authCard').style.display = 'block';
+    document.getElementById('email').value = '';
+    document.getElementById('password').value = '';
+    clearErrors();
+  }
+
+  async function loadServices() {
+    const listEl = document.getElementById('servicesList');
+    listEl.innerText = 'Inapakia huduma...';
+    try {
+      const res = await fetch(API_URL + '/api/services');
+      const data = await res.json();
+      listEl.innerHTML = '';
+      data.services.forEach(service => {
+        const meta = ICONS[service.name] || { icon: '⚙️', cls: 'icon-domain', desc: '' };
+        const item = document.createElement('div');
+        item.className = 'service-item';
+        item.innerHTML = `
+          <div class="service-icon ${meta.cls}">${meta.icon}</div>
+          <div class="service-info">
+            <div class="service-name">${service.name}</div>
+            <div class="service-desc">${meta.desc}</div>
+          </div>
+          <div class="status-badge">⏱ ${service.status}</div>
+          <div class="chevron">›</div>
+        `;
+        listEl.appendChild(item);
+      });
+    } catch (err) {
+      listEl.innerText = 'Imeshindikana kupakia huduma. Jaribu tena baadaye.';
+    }
+  }
+</script>
+
+</body>
+</html>
+  

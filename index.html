@@ -185,6 +185,38 @@
     margin-top: 18px; background: rgba(255,255,255,0.08); color: #cbd5e1;
     font-weight: 600; font-size: 0.85rem;
   }
+.host-panel {
+    background: rgba(13, 21, 38, 0.75);
+    backdrop-filter: blur(8px);
+    margin: 0 16px 16px 16px;
+    border-radius: 16px;
+    padding: 18px;
+    border: 1px solid rgba(148,163,184,0.08);
+  }
+  .host-panel input, .host-panel textarea {
+    width: 100%; padding: 11px 12px; border-radius: 10px; border: none;
+    font-size: 0.88rem; background: #f1f5f9; margin-bottom: 10px;
+    font-family: inherit;
+  }
+  .host-panel textarea {
+    font-family: 'Courier New', monospace; font-size: 0.8rem;
+    resize: vertical; min-height: 100px; line-height: 1.4;
+  }
+  .host-panel textarea:focus, .host-panel input:focus {
+    outline: none; box-shadow: 0 0 0 3px rgba(56,189,248,0.25);
+  }
+  .host-submit-btn {
+    background: linear-gradient(135deg, #a78bfa, #7c3aed);
+    box-shadow: 0 6px 18px rgba(124,58,237,0.35);
+  }
+  .host-result {
+    margin-top: 12px; padding: 12px 14px; border-radius: 10px;
+    font-size: 0.85rem; display: none; word-break: break-all; line-height: 1.5;
+  }
+  .host-result.success { background: rgba(52,211,153,0.12); color: #6ee7b7; border: 1px solid rgba(52,211,153,0.3); display: block; }
+  .host-result.error { background: rgba(248,113,113,0.12); color: #fca5a5; border: 1px solid rgba(248,113,113,0.3); display: block; }
+  .host-result a { color: #93c5fd; font-weight: 700; text-decoration: underline; }
+  .host-note { font-size: 0.7rem; color: #64748b; margin-top: 10px; line-height: 1.4; }
 </style>
 </head>
 <body><div class="card" id="authCard">

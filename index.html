@@ -509,6 +509,53 @@
       btn.innerText = originalText;
     }
   }
+async function submitHostedSite() {
+    const slugInput = document.getElementById('hostSlug');
+    const htmlInput = document.getElementById('hostHtml');
+    const btn = document.getElementById('hostSubmitBtn');
+    const resultEl = document.getElementById('hostResult');
+    const owner_email = localStorage.getItem('lucashost_email') || '';
+
+    const slug = slugInput.value.trim();
+    const html_content = htmlInput.value.trim();
+
+    resultEl.className = 'host-result';
+    resultEl.innerHTML = '';
+
+    if (!slug || !html_content) {
+      resultEl.className = 'host-result error';
+      resultEl.innerText = 'Jaza jina la tovuti na HTML yote';
+      return;
+    }
+
+    btn.disabled = true;
+    const originalText = btn.innerText;
+    btn.innerHTML = '<span class="spinner"></span> Inachapisha...';
+
+    try {
+      const res = await fetch(API_URL + '/api/hosted-sites', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug, owner_email, html_content }),
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        const link = API_URL + '/site/' + data.slug;
+        resultEl.className = 'host-result success';
+        resultEl.innerHTML = '✓ Tovuti imechapishwa! Link: <a href="' + link + '" target="_blank">' + link + '</a>';
+      } else {
+        resultEl.className = 'host-result error';
+        resultEl.innerText = data.error || 'Kuna tatizo limejitokeza';
+      }
+    } catch (err) {
+      resultEl.className = 'host-result error';
+      resultEl.innerText = 'Imeshindikana kuunganisha na server';
+    } finally {
+      btn.disabled = false;
+      btn.innerText = originalText;
+    }
+  }
 </script>
 
 </body>

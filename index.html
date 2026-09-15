@@ -217,6 +217,31 @@
   .host-result.error { background: rgba(248,113,113,0.12); color: #fca5a5; border: 1px solid rgba(248,113,113,0.3); display: block; }
   .host-result a { color: #93c5fd; font-weight: 700; text-decoration: underline; }
   .host-note { font-size: 0.7rem; color: #64748b; margin-top: 10px; line-height: 1.4; }
+ .sites-panel {
+    background: rgba(13, 21, 38, 0.75);
+    margin: 0 16px 16px 16px;
+    border-radius: 16px;
+    padding: 18px;
+    border: 1px solid rgba(148,163,184,0.08);
+  }
+  .site-card {
+    display: flex; align-items: center; gap: 10px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+    border: 1px solid rgba(148,163,184,0.1);
+    padding: 12px; border-radius: 12px; margin-bottom: 8px;
+  }
+  .site-card:last-child { margin-bottom: 0; }
+  .site-info { flex: 1; min-width: 0; }
+  .site-slug { font-weight: 600; font-size: 0.88rem; color: #f1f5f9; word-break: break-all; }
+  .site-date { font-size: 0.7rem; color: #64748b; margin-top: 2px; }
+  .site-actions { display: flex; gap: 6px; }
+  .site-btn {
+    width: auto; padding: 8px 12px; margin-top: 0; font-size: 0.78rem;
+    border-radius: 8px;
+  }
+  .site-view { background: linear-gradient(135deg, #38bdf8, #2563eb); }
+  .site-delete { background: rgba(248,113,113,0.15); color: #fca5a5; }
+  .sites-empty { color: #64748b; font-size: 0.85rem; text-align: center; padding: 10px 0; }
 </style>
 </head>
 <body><div class="card" id="authCard">

@@ -627,27 +627,26 @@ async function submitHostedSite() {
       listEl.innerText = 'Imeshindikana kupakia tovuti zako.';
     }
   }
+async function deleteSite(slug) {
+      if (!confirm('Una uhakika unataka kufuta ' + slug + '?')) return;
+      const email = localStorage.getItem('lucashost_email');
 
-  async function deleteSite(slug) {
-    if (!confirm('Una uhakika unataka kufuta ' + slug + '?')) return;
-    const email = localStorage.getItem('lucashost_email');
-
-    try {
-      const res = await fetch(API_URL + '/api/hosted-sites/' + slug, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      });
-      if (res.ok) {
-        loadMySites();
-      } else {
-        alert('Imeshindikana kufuta tovuti hii.');
+      try {
+        const res = await fetch(API_URL + '/api/hosted-sites/' + slug, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email }),
+        });
+        if (res.ok) {
+          loadMySites();
+        } else {
+          alert('Imeshindikana kufuta tovuti hii.');
+        }
+      } catch (err) {
+        alert('Imeshindikana kuunganisha na server.');
       }
-    } catch (err) {
-      alert('Imeshindikana kuunganisha na server.');
     }
-}
-</script>
-
+  </script>
 </body>
 </html>
+  

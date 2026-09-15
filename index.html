@@ -586,7 +586,67 @@ async function submitHostedSite() {
       btn.disabled = false;
       btn.innerText = originalText;
     }
+ async function loadMySites() {
+    const listEl = document.getElementById('mySitesList');
+    const email = localStorage.getItem('lucashost_email');
+    if (!email) { listEl.innerText = 'Ingia tena ili kuona tovuti zako.'; return; }
+
+    listEl.className = '';
+    listEl.innerText = 'Inapakia...';
+
+    try {
+      const res = await fetch(API_URL + '/api/my-sites?email=' + encodeURIComponent(email));
+      const data = await res.json();
+
+      if (!data.sites || data.sites.length === 0) {
+        listEl.className = 'sites-empty';
+        listEl.innerText = 'Bado hujachapisha tovuti yoyote.';
+        return;
+      }
+
+      listEl.innerHTML = '';
+      data.sites.forEach(site => {
+        const link = API_URL + '/site/' + site.slug;
+        const card = document.createElement('div');
+        card.className = 'site-card';
+        card.innerHTML = `
+          <div class="site-info">
+            <div class="site-slug">${site.slug}</div>
+            <div class="site-date">${new Date(site.created_at).toLocaleDateString()}</div>
+          </div>
+          <div class="site-actions">
+            <button class="site-btn site-view" onclick="window.open('${link}', '_blank')">Fungua</button>
+            <button class="site-btn site-delete" onclick="deleteSite('${site.slug}')">Futa</button>
+          </div>
+        `;
+        listEl.appendChild(card);
+      });
+    } catch (err) {
+      listEl.className = 'sites-empty';
+      listEl.innerText = 'Imeshindikana kupakia tovuti zako.';
+    }
   }
+
+  async function deleteSite(slug) {
+    if (!confirm('Una uhakika unataka kufuta ' + slug + '?')) return;
+    const email = localStorage.getItem('lucashost_email');
+
+    try {
+      const res = await fetch(API_URL + '/api/hosted-sites/' + slug, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      if (res.ok) {
+        loadMySites();
+      } else {
+        alert('Imeshindikana kufuta tovuti hii.');
+      }
+    } catch (err) {
+      alert('Imeshindikana kuunganisha na server.');
+    }
+  } 
+}
 </script>
 
 </body>

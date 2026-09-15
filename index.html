@@ -574,6 +574,7 @@ async function submitHostedSite() {
         const link = API_URL + '/site/' + data.slug;
         resultEl.className = 'host-result success';
         resultEl.innerHTML = '✓ Tovuti imechapishwa! Link: <a href="' + link + '" target="_blank">' + link + '</a>';
+       loadMySites();
       } else {
         resultEl.className = 'host-result error';
         resultEl.innerText = data.error || 'Kuna tatizo limejitokeza';
